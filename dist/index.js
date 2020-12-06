@@ -3,6 +3,8 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var treeModel = _interopDefault(require('tree-model'));
 var performantArrayToTree = require('performant-array-to-tree');
 var flattree = require('flattree');
+var nanoid = require('nanoid');
+var lodash = require('lodash');
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -43,7 +45,28 @@ var toFlatTree = function toFlatTree(tree, options) {
   }, options));
 };
 
+function setIdsForTree(tree, _ref) {
+  var _ref$key = _ref.key,
+      key = _ref$key === void 0 ? 'id' : _ref$key;
+
+  if (lodash.isPlainObject(tree)) {
+    tree[key] = lodash.isNil(tree[key]) ? nanoid.nanoid() : tree[key];
+    if (tree.children) return _extends({}, tree, {
+      children: tree.children.map(function (c) {
+        return setIdsForTree(c);
+      })
+    });
+  } else if (lodash.isArray(tree)) {
+    return tree.map(function (i) {
+      return setIdsForTree(i);
+    });
+  }
+
+  return tree;
+}
+
 exports.TreeModel = treeModel;
+exports.setIdsForTree = setIdsForTree;
 exports.toFlatTree = toFlatTree;
 exports.toTree = toTree;
 //# sourceMappingURL=index.js.map

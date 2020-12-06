@@ -1,6 +1,8 @@
 export { default as TreeModel } from 'tree-model';
 import { arrayToTree } from 'performant-array-to-tree';
 import { flatten } from 'flattree';
+import { nanoid } from 'nanoid';
+import { isPlainObject, isNil, isArray } from 'lodash';
 
 function _extends() {
   _extends = Object.assign || function (target) {
@@ -41,5 +43,25 @@ var toFlatTree = function toFlatTree(tree, options) {
   }, options));
 };
 
-export { toFlatTree, toTree };
+function setIdsForTree(tree, _ref) {
+  var _ref$key = _ref.key,
+      key = _ref$key === void 0 ? 'id' : _ref$key;
+
+  if (isPlainObject(tree)) {
+    tree[key] = isNil(tree[key]) ? nanoid() : tree[key];
+    if (tree.children) return _extends({}, tree, {
+      children: tree.children.map(function (c) {
+        return setIdsForTree(c);
+      })
+    });
+  } else if (isArray(tree)) {
+    return tree.map(function (i) {
+      return setIdsForTree(i);
+    });
+  }
+
+  return tree;
+}
+
+export { setIdsForTree, toFlatTree, toTree };
 //# sourceMappingURL=index.modern.js.map

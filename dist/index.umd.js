@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('tree-model'), require('performant-array-to-tree'), require('flattree')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'tree-model', 'performant-array-to-tree', 'flattree'], factory) :
-  (global = global || self, factory(global.TreeJS = {}, global.treeModel, global.performantArrayToTree, global.flattree));
-}(this, (function (exports, treeModel, performantArrayToTree, flattree) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('tree-model'), require('performant-array-to-tree'), require('flattree'), require('nanoid'), require('lodash')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'tree-model', 'performant-array-to-tree', 'flattree', 'nanoid', 'lodash'], factory) :
+  (global = global || self, factory(global.TreeJS = {}, global.treeModel, global.performantArrayToTree, global.flattree, global.nanoid, global.lodash));
+}(this, (function (exports, treeModel, performantArrayToTree, flattree, nanoid, lodash) {
   treeModel = treeModel && Object.prototype.hasOwnProperty.call(treeModel, 'default') ? treeModel['default'] : treeModel;
 
   function _extends() {
@@ -44,7 +44,28 @@
     }, options));
   };
 
+  function setIdsForTree(tree, _ref) {
+    var _ref$key = _ref.key,
+        key = _ref$key === void 0 ? 'id' : _ref$key;
+
+    if (lodash.isPlainObject(tree)) {
+      tree[key] = lodash.isNil(tree[key]) ? nanoid.nanoid() : tree[key];
+      if (tree.children) return _extends({}, tree, {
+        children: tree.children.map(function (c) {
+          return setIdsForTree(c);
+        })
+      });
+    } else if (lodash.isArray(tree)) {
+      return tree.map(function (i) {
+        return setIdsForTree(i);
+      });
+    }
+
+    return tree;
+  }
+
   exports.TreeModel = treeModel;
+  exports.setIdsForTree = setIdsForTree;
   exports.toFlatTree = toFlatTree;
   exports.toTree = toTree;
 
